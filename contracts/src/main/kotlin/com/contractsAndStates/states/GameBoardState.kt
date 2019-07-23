@@ -2,6 +2,7 @@ package com.contractsAndStates.states
 
 import com.contractsAndStates.contracts.GameStateContract
 import net.corda.core.contracts.BelongsToContract
+import net.corda.core.contracts.LinearPointer
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.Party
@@ -44,6 +45,7 @@ data class GameBoardState @ConstructorForDeserialization constructor(
     }
 
     fun weWin(ourIdentity: Party) = copy(winner = ourIdentity)
+    fun toPointer() = LinearPointer(linearId, GameBoardState::class.java)
 
     fun toBuilder() = Builder(
             linearId = linearId,
@@ -123,3 +125,7 @@ data class GameBoardState @ConstructorForDeserialization constructor(
 }
 
 internal class ImmutableList<T>(private val inner: List<T>) : List<T> by inner
+
+interface BelongsToGameBoard {
+    val gameBoardPointer: LinearPointer<GameBoardState>
+}

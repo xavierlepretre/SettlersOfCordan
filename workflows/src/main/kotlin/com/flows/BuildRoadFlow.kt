@@ -6,6 +6,7 @@ import com.contractsAndStates.contracts.GameStateContract
 import com.contractsAndStates.contracts.LongestRoadContract
 import com.contractsAndStates.states.*
 import net.corda.core.contracts.Command
+import net.corda.core.contracts.LinearPointer
 import net.corda.core.contracts.ReferencedStateAndRef
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
@@ -34,7 +35,6 @@ class BuildRoadFlow(
 
     @Suspendable
     override fun call(): SignedTransaction {
-
 
         // Step 1. Retrieve the Game Board State from the vault.
         val gameBoardStateAndRef = serviceHub.vaultService
@@ -68,7 +68,11 @@ class BuildRoadFlow(
         tb.addCommand(buildRoadCommand)
 
         // Step 7. Create initial road state
-        val roadState = RoadState(absoluteSide, gameBoardState.players, ourIdentity)
+        val roadState = RoadState(
+                gameBoardPointer = LinearPointer(gameBoardLinearId, GameBoardState::class.java),
+                absoluteSide = absoluteSide,
+                players = gameBoardState.players,
+                owner = ourIdentity)
 
         // Step 8. Determine if the road state is extending an existing road
         val newBoardStateBuilder = gameBoardState.toBuilder()

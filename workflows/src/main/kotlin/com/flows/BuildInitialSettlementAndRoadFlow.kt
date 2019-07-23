@@ -10,6 +10,7 @@ import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.flows.issue.addIssueTokens
 import com.r3.corda.lib.tokens.workflows.utilities.addTokenTypeJar
 import net.corda.core.contracts.Command
+import net.corda.core.contracts.LinearPointer
 import net.corda.core.contracts.ReferencedStateAndRef
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.*
@@ -108,7 +109,11 @@ class BuildInitialSettlementAndRoadFlow(
         }
 
         // Step 10. Create the road state at the appropriate location specified by the user.
-        val roadState = RoadState(absoluteSide, gameBoardState.players, ourIdentity)
+        val roadState = RoadState(
+                gameBoardPointer = LinearPointer(gameBoardLinearId, GameBoardState::class.java),
+                absoluteSide = absoluteSide,
+                players = gameBoardState.players,
+                owner = ourIdentity)
 
         // Step 11. Update the gameBoardState hexTiles with the roads being built.
         boardBuilder.setRoadOn(absoluteSide, roadState.linearId)
